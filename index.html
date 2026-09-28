@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Banker's Algorithm Simulator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════
+       HEADER
+  ══════════════════════════════════════════════ -->
+  <header class="site-header">
+    <div class="header-inner">
+      <h1 class="header-title">Banker's Algorithm Simulator</h1>
+      <p class="header-subtitle">Deadlock Avoidance and Resource Allocation &mdash; Operating Systems Mini-Project</p>
+    </div>
+  </header>
+
+  <main class="page-main">
+
+    <!-- ══════════════════════════════════════════════
+         SECTION 1 — System Configuration
+    ══════════════════════════════════════════════ -->
+    <section class="card">
+      <h2 class="card-title">System Configuration</h2>
+      <p class="card-subtitle">Set the number of processes and resource types, then create the matrices.</p>
+
+      <div class="config-grid">
+        <div class="form-field">
+          <label class="field-label" for="num-processes">
+            Number of Processes
+            <span class="field-hint">(1 – 10)</span>
+          </label>
+          <input class="field-input" type="number" id="num-processes" min="1" max="10" value="5" />
+        </div>
+        <div class="form-field">
+          <label class="field-label" for="num-resources">
+            Number of Resource Types
+            <span class="field-hint">(1 – 6)</span>
+          </label>
+          <input class="field-input" type="number" id="num-resources" min="1" max="6" value="3" />
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-create">
+          Create Matrices
+        </button>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         QUICK TEST CASES
+    ══════════════════════════════════════════════ -->
+    <section class="card">
+      <h2 class="card-title">Quick Test Cases</h2>
+      <p class="card-subtitle">Load a preset example or generate random data to get started quickly.</p>
+
+      <div class="test-cases-grid">
+        <div class="test-case-item">
+          <div class="test-case-icon tc-safe">✓</div>
+          <div class="test-case-body">
+            <strong>Safe Example</strong>
+            <p>Classic textbook safe-state. Expected sequence: P1 → P3 → P4 → P0 → P2</p>
+          </div>
+          <button class="btn btn-outline-green" id="btn-load-safe">Load Safe</button>
+        </div>
+
+        <div class="test-case-item">
+          <div class="test-case-icon tc-unsafe">✕</div>
+          <div class="test-case-body">
+            <strong>Unsafe Example</strong>
+            <p>Demonstrates a state where no safe sequence exists and deadlock may occur.</p>
+          </div>
+          <button class="btn btn-outline-red" id="btn-load-unsafe">Load Unsafe</button>
+        </div>
+
+        <div class="test-case-item">
+          <div class="test-case-icon tc-random">⚄</div>
+          <div class="test-case-body">
+            <strong>Random Example</strong>
+            <p>Generate a random simulation dataset with valid Allocation and Maximum values.</p>
+          </div>
+          <button class="btn btn-outline-blue" id="btn-random">Generate</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         SIMULATOR BODY — revealed after "Create Matrices"
+    ══════════════════════════════════════════════ -->
+    <div id="simulator-body" class="hidden">
+
+      <!-- ── Allocation + Maximum side-by-side ── -->
+      <div class="matrix-pair">
+
+        <!-- SECTION 2 — Allocation Matrix -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Allocation Matrix</h2>
+              <p class="card-subtitle">Resources currently allocated to each process.</p>
+            </div>
+            <span class="card-tag tag-blue">Currently Allocated</span>
+          </div>
+          <div class="table-scroll">
+            <table id="tbl-allocation"></table>
+          </div>
+        </section>
+
+        <!-- SECTION 3 — Maximum Matrix -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Maximum Matrix</h2>
+              <p class="card-subtitle">Maximum resources each process may ever request.</p>
+            </div>
+            <span class="card-tag tag-purple">Max Demand</span>
+          </div>
+          <div class="table-scroll">
+            <table id="tbl-maximum"></table>
+          </div>
+        </section>
+
+      </div><!-- /.matrix-pair -->
+
+      <!-- SECTION 4 — Available Resources -->
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Available Resources</h2>
+            <p class="card-subtitle">Resources currently free and available in the system.</p>
+          </div>
+          <span class="card-tag tag-green">Free Instances</span>
+        </div>
+
+        <div id="available-inputs" class="available-row"></div>
+
+        <div class="action-bar">
+          <button class="btn btn-success btn-lg" id="btn-check">
+            Check Safe State
+          </button>
+          <button class="btn btn-ghost" id="btn-reset">
+            Reset
+          </button>
+        </div>
+      </section>
+
+      <!-- SECTION 5 — Need Matrix -->
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Need Matrix</h2>
+            <p class="card-subtitle">Remaining resources each process may still request.</p>
+          </div>
+          <span class="formula-badge">Need = Maximum &minus; Allocation</span>
+        </div>
+        <div class="table-scroll">
+          <table id="tbl-need"></table>
+        </div>
+      </section>
+
+      <!-- ══ SYSTEM STATUS ══ -->
+      <section class="card" id="status-card" style="display:none;">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">System Status</h2>
+            <p class="card-subtitle">Result of the Banker's Safety Algorithm.</p>
+          </div>
+        </div>
+
+        <div id="status-box"></div>
+
+        <div id="safe-sequence-box" style="display:none; margin-top:1.25rem;">
+          <p class="seq-label">Safe Sequence</p>
+          <div id="safe-sequence-display" class="seq-wrap"></div>
+        </div>
+      </section>
+
+      <!-- ══ STEP-BY-STEP EXECUTION ══ -->
+      <section class="card" id="steps-card" style="display:none;">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Step-by-Step Execution</h2>
+            <p class="card-subtitle">Follow how the Safety Algorithm evaluates each process.</p>
+          </div>
+        </div>
+        <div id="steps-container"></div>
+      </section>
+
+      <!-- ══ RESOURCE REQUEST ══ -->
+      <section class="card" id="sec-request">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Resource Request</h2>
+            <p class="card-subtitle">Test whether a process request can be safely granted.</p>
+          </div>
+          <span class="card-tag tag-amber">Request Check</span>
+        </div>
+
+        <div class="request-layout">
+          <div class="form-field req-pid-field">
+            <label class="field-label" for="req-pid">Process</label>
+            <select class="field-select" id="req-pid"></select>
+          </div>
+
+          <div class="form-field">
+            <label class="field-label">Request Vector</label>
+            <div id="req-inputs" class="available-row"></div>
+          </div>
+
+          <div class="req-action">
+            <button class="btn btn-primary btn-lg" id="btn-req-check">
+              Check Request
+            </button>
+          </div>
+        </div>
+
+        <div id="req-result"  style="margin-top:1.25rem;"></div>
+        <div id="req-steps"   style="margin-top:1rem;"></div>
+      </section>
+
+    </div><!-- /#simulator-body -->
+
+    <!-- ══════════════════════════════════════════════
+         HOW IT WORKS
+    ══════════════════════════════════════════════ -->
+    <section class="card">
+      <h2 class="card-title" style="margin-bottom:0.25rem;">How Banker's Algorithm Works</h2>
+      <p class="card-subtitle">A deadlock-avoidance algorithm that determines whether a safe execution order exists.</p>
+
+      <div class="edu-cards">
+        <div class="edu-card">
+          <span class="edu-num">01</span>
+          <h3>Allocation</h3>
+          <p>Resources currently allocated to each process in the system.</p>
+        </div>
+        <div class="edu-card">
+          <span class="edu-num">02</span>
+          <h3>Maximum</h3>
+          <p>Maximum resources each process may ever request during its lifetime.</p>
+        </div>
+        <div class="edu-card">
+          <span class="edu-num">03</span>
+          <h3>Need</h3>
+          <p>Remaining resources a process may still request. Computed automatically.</p>
+          <code class="edu-formula">Need = Maximum &minus; Allocation</code>
+        </div>
+        <div class="edu-card">
+          <span class="edu-num">04</span>
+          <h3>Safe Sequence</h3>
+          <p>An ordering of all processes where every process can finish without causing deadlock.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ══════════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-title">Operating Systems Mini-Project</span>
+      <span class="footer-sep">&middot;</span>
+      <span class="footer-sub">Banker's Algorithm &nbsp;&bull;&nbsp; Deadlock Avoidance</span>
+    </div>
+  </footer>
+
+  <!-- Main simulator logic — do NOT modify -->
+  <script src="script.js"></script>
+
+</body>
+</html>

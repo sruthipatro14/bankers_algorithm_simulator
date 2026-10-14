@@ -18,7 +18,300 @@
     </div>
   </header>
 
-  <main class="page-main">
+  <!-- ══════════════════════════════════════════════════════════
+       EDUCATIONAL INTRODUCTION  (inserted above simulator)
+       All markup uses class .edu-intro-* — nothing below is
+       touched; script.js and all simulator IDs are unchanged.
+  ══════════════════════════════════════════════════════════ -->
+  <div class="edu-intro-wrapper">
+
+    <!-- ── 1. What is Banker's Algorithm? ── -->
+    <section class="edu-intro-card" aria-labelledby="edu-heading-intro">
+      <h2 class="edu-intro-section-heading" id="edu-heading-intro">
+        <span aria-hidden="true"></span>What is Banker's Algorithm?
+      </h2>
+      <p class="edu-intro-body">
+        Banker's Algorithm is a resource allocation and deadlock avoidance algorithm used in
+        operating systems. It checks whether granting resource requests keeps the system in a
+        <strong>safe state</strong> — one where at least one safe sequence exists in which all
+        processes can complete.
+      </p>
+      <ul class="edu-intro-list">
+        <li>It avoids deadlock by ensuring that resource allocations keep the system in a safe state.</li>
+        <li>It keeps track of the resources each process needs and the resources currently available.</li>
+      </ul>
+    </section>
+
+    <!-- ── 2. Components ── -->
+    <section class="edu-intro-card" aria-labelledby="edu-heading-components">
+      <h2 class="edu-intro-section-heading" id="edu-heading-components">
+        <span aria-hidden="true"></span>Components of Banker's Algorithm
+      </h2>
+      <p class="edu-intro-body">
+        Let <strong>n</strong> be the number of processes in the system and
+        <strong>m</strong> be the number of resource types.
+      </p>
+
+      <div class="edu-intro-components-grid">
+
+        <!-- Available -->
+        <div class="edu-intro-component-card edu-intro-comp-available">
+          <span class="edu-intro-comp-label">Available</span>
+          <h3 class="edu-intro-comp-title">Available</h3>
+          <p class="edu-intro-comp-body">
+            A one-dimensional array of size <em>m</em> indicating the number of available
+            resources of each type.
+          </p>
+          <p class="edu-intro-comp-def">
+            Available[j] = k means there are k instances of resource type R<sub>j</sub>
+            currently available.
+          </p>
+        </div>
+
+        <!-- Max -->
+        <div class="edu-intro-component-card edu-intro-comp-max">
+          <span class="edu-intro-comp-label">Max</span>
+          <h3 class="edu-intro-comp-title">Max</h3>
+          <p class="edu-intro-comp-body">
+            A two-dimensional array of size n &times; m that defines the maximum demand of
+            each process in the system.
+          </p>
+          <p class="edu-intro-comp-def">
+            Max[i, j] = k means process P<sub>i</sub> may request at most k instances of
+            resource type R<sub>j</sub>.
+          </p>
+        </div>
+
+        <!-- Allocation -->
+        <div class="edu-intro-component-card edu-intro-comp-allocation">
+          <span class="edu-intro-comp-label">Allocation</span>
+          <h3 class="edu-intro-comp-title">Allocation</h3>
+          <p class="edu-intro-comp-body">
+            A two-dimensional array of size n &times; m that defines the number of resources
+            of each type currently allocated to each process.
+          </p>
+          <p class="edu-intro-comp-def">
+            Allocation[i, j] = k means process P<sub>i</sub> is currently allocated k
+            instances of resource type R<sub>j</sub>.
+          </p>
+        </div>
+
+        <!-- Need -->
+        <div class="edu-intro-component-card edu-intro-comp-need">
+          <span class="edu-intro-comp-label">Need</span>
+          <h3 class="edu-intro-comp-title">Need</h3>
+          <p class="edu-intro-comp-body">
+            A two-dimensional array of size n &times; m that indicates the remaining resource
+            needs of each process.
+          </p>
+          <p class="edu-intro-comp-def">
+            Need[i, j] = k means process P<sub>i</sub> currently needs k additional instances
+            of resource type R<sub>j</sub>.
+          </p>
+          <code class="edu-intro-comp-formula">Need[i, j] = Max[i, j] &minus; Allocation[i, j]</code>
+        </div>
+
+      </div><!-- /.edu-intro-components-grid -->
+
+      <p class="edu-intro-components-note">
+        <strong>Allocation</strong> specifies the resources currently allocated to process
+        P<sub>i</sub>, while <strong>Need</strong> specifies the additional resources that
+        process P<sub>i</sub> may still request to complete its task.
+      </p>
+    </section>
+
+    <!-- ── 3. Safe State and Unsafe State ── -->
+    <section class="edu-intro-card" aria-labelledby="edu-heading-states">
+      <h2 class="edu-intro-section-heading" id="edu-heading-states">
+        <span aria-hidden="true"></span>Key Concepts in Banker's Algorithm
+      </h2>
+
+      <div class="edu-intro-state-grid">
+
+        <div class="edu-intro-state-card edu-intro-state-safe">
+          <h3 class="edu-intro-state-heading">
+            <span class="edu-intro-state-dot" aria-hidden="true"></span>Safe State
+          </h3>
+          <p class="edu-intro-state-body">
+            There exists at least one sequence of processes such that each process can obtain
+            its needed resources, complete its execution, release its resources, and allow the
+            remaining processes to complete — without entering a deadlock.
+          </p>
+        </div>
+
+        <div class="edu-intro-state-card edu-intro-state-unsafe">
+          <h3 class="edu-intro-state-heading">
+            <span class="edu-intro-state-dot" aria-hidden="true"></span>Unsafe State
+          </h3>
+          <p class="edu-intro-state-body">
+            An unsafe state does not necessarily mean that a deadlock has already occurred.
+            It means the system <em>cannot guarantee</em> that all processes will complete
+            without potentially causing a deadlock.
+          </p>
+        </div>
+
+      </div><!-- /.edu-intro-state-grid -->
+    </section>
+
+    <!-- ── 4. Safety Algorithm ── -->
+    <section class="edu-intro-card" aria-labelledby="edu-heading-safety">
+      <h2 class="edu-intro-section-heading" id="edu-heading-safety">
+        <span aria-hidden="true"></span>Safety Algorithm
+      </h2>
+      <p class="edu-intro-algo-intro">
+        The safety algorithm checks whether the system is in a safe state, meaning all
+        processes can complete without causing deadlock.
+      </p>
+
+      <div class="edu-intro-steps">
+
+        <div class="edu-intro-step">
+          <div class="edu-intro-step-num" aria-hidden="true">1</div>
+          <div class="edu-intro-step-body">
+            <h3 class="edu-intro-step-title">Initialize</h3>
+            <ul class="edu-intro-step-list">
+              <li><code>Work = Available</code></li>
+              <li><code>Finish[i] = false</code> for all processes, because none have finished yet.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="edu-intro-step">
+          <div class="edu-intro-step-num" aria-hidden="true">2</div>
+          <div class="edu-intro-step-body">
+            <h3 class="edu-intro-step-title">Find an eligible process</h3>
+            <p class="edu-intro-step-text">
+              Find a process P<sub>i</sub> for which both conditions hold:
+            </p>
+            <ul class="edu-intro-step-list">
+              <li><code>Finish[i] = false</code></li>
+              <li><code>Need[i] &le; Work</code></li>
+            </ul>
+            <p class="edu-intro-step-text" style="margin-top:0.45rem;">
+              If <code>Need[i] &le; Work</code>, assume P<sub>i</sub> receives the remaining
+              resources it requires, completes execution, and releases all its allocated resources.
+            </p>
+          </div>
+        </div>
+
+        <div class="edu-intro-step">
+          <div class="edu-intro-step-num" aria-hidden="true">3</div>
+          <div class="edu-intro-step-body">
+            <h3 class="edu-intro-step-title">Update resources</h3>
+            <ul class="edu-intro-step-list">
+              <li><code>Work = Work + Allocation[i]</code></li>
+              <li><code>Finish[i] = true</code></li>
+              <li>Repeat Step 2 for the remaining unfinished processes.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="edu-intro-step">
+          <div class="edu-intro-step-num" aria-hidden="true">4</div>
+          <div class="edu-intro-step-body">
+            <h3 class="edu-intro-step-title">Determine the result</h3>
+            <ul class="edu-intro-step-list">
+              <li>If all processes have <code>Finish[i] = true</code>, the system is in a <strong>safe state</strong>.</li>
+              <li>If no eligible process can be found while some remain unfinished, the system is <strong>unsafe</strong>.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div><!-- /.edu-intro-steps -->
+
+      <p class="edu-intro-algo-note">
+        The algorithm simulates process completion to verify that all processes can finish safely.
+      </p>
+    </section>
+
+    <!-- ── 5. Resource Request Algorithm ── -->
+    <section class="edu-intro-card" aria-labelledby="edu-heading-request">
+      <h2 class="edu-intro-section-heading" id="edu-heading-request">
+        <span aria-hidden="true"></span>Resource Request Algorithm
+      </h2>
+      <p class="edu-intro-algo-intro">
+        This algorithm determines whether a process's resource request can be safely granted
+        without putting the system into an unsafe state.
+      </p>
+
+      <div class="edu-intro-steps">
+
+        <div class="edu-intro-step">
+          <div class="edu-intro-step-num" aria-hidden="true">1</div>
+          <div class="edu-intro-step-body">
+            <h3 class="edu-intro-step-title">Check the process's remaining need</h3>
+            <p class="edu-intro-step-text">
+              If <code>Request[i] &gt; Need[i]</code>, reject the request — the process has
+              exceeded its declared maximum demand.
+            </p>
+          </div>
+        </div>
+
+        <div class="edu-intro-step">
+          <div class="edu-intro-step-num" aria-hidden="true">2</div>
+          <div class="edu-intro-step-body">
+            <h3 class="edu-intro-step-title">Check resource availability</h3>
+            <p class="edu-intro-step-text">
+              If <code>Request[i] &gt; Available</code>, the process must wait until the
+              requested resources become available.
+            </p>
+          </div>
+        </div>
+
+        <div class="edu-intro-step">
+          <div class="edu-intro-step-num" aria-hidden="true">3</div>
+          <div class="edu-intro-step-body">
+            <h3 class="edu-intro-step-title">Temporarily allocate resources</h3>
+            <p class="edu-intro-step-text">If both checks pass, temporarily update:</p>
+            <ul class="edu-intro-step-list">
+              <li><code>Available = Available &minus; Request[i]</code></li>
+              <li><code>Allocation[i] = Allocation[i] + Request[i]</code></li>
+              <li><code>Need[i] = Need[i] &minus; Request[i]</code></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="edu-intro-step">
+          <div class="edu-intro-step-num" aria-hidden="true">4</div>
+          <div class="edu-intro-step-body">
+            <h3 class="edu-intro-step-title">Run the Safety Algorithm</h3>
+            <ul class="edu-intro-step-list">
+              <li>If the resulting state is <strong>safe</strong>, grant the request.</li>
+              <li>If the resulting state is <strong>unsafe</strong>, roll back all temporary changes and make the process wait.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div><!-- /.edu-intro-steps -->
+
+      <p class="edu-intro-algo-note">
+        The resource-request algorithm ensures that resources are granted only when the system
+        remains safe, helping prevent deadlock.
+      </p>
+    </section>
+
+    <!-- ── 6. Call-to-action: scroll to simulator ── -->
+    <section class="edu-intro-card edu-intro-cta" aria-labelledby="edu-heading-cta">
+      <h2 class="edu-intro-section-heading edu-intro-cta-heading" id="edu-heading-cta">
+        Try the Interactive Simulator
+      </h2>
+      <p class="edu-intro-cta-body">
+        Now that you understand the components and algorithms, experiment with resource
+        allocation, calculate Need, check safe sequences, and test resource requests using
+        the simulator below.
+      </p>
+      <button
+        class="edu-intro-cta-btn"
+        onclick="document.getElementById('simulator-section').scrollIntoView({ behavior: 'smooth' })"
+        type="button"
+      >
+        Start Simulation ↓
+      </button>
+    </section>
+
+  </div><!-- /.edu-intro-wrapper -->
+
+  <main class="page-main" id="simulator-section">
 
     <!-- ══════════════════════════════════════════════
          SECTION 1 — System Configuration
